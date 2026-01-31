@@ -122,3 +122,54 @@ h4 {
 .text-gradient {
   color: var(--color-primary);
 }
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.checkbox-text {
+  font-weight: 600;
+  color: var(--color-text-main);
+}
+
+.checkbox-hint {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+
+.metric-section {
+  margin-bottom: 20px;
+}
+
+.metric-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-text-muted);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--color-border);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: var(--color-text-muted);
+}

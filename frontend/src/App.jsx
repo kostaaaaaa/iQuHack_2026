@@ -1,10 +1,17 @@
 import { useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Activity, ShieldCheck, Zap } from 'lucide-react';
 import './App.css';
 
+const RISK_METRICS = [
+  { key: 'VaR', label: 'VaR', fullName: 'Value at Risk' },
+  { key: 'CVaR', label: 'CVaR', fullName: 'Conditional VaR' },
+  { key: 'EVaR', label: 'EVaR', fullName: 'Entropic VaR' },
+  { key: 'RVaR', label: 'RVaR', fullName: 'Range VaR' },
+];
+
 // Placeholder API calls - replace with real fetches later
-const fetchClassicalVaR = async (params) => {
+const fetchClassicalResult = async (params) => {
   const response = await fetch('http://localhost:8000/api/classical-var', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -13,7 +20,7 @@ const fetchClassicalVaR = async (params) => {
   return response.json();
 };
 
-const fetchQuantumVaR = async (params) => {
+const fetchQuantumResult = async (params) => {
   const response = await fetch('http://localhost:8000/api/quantum-var', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -25,23 +32,36 @@ const fetchQuantumVaR = async (params) => {
 function App() {
   const [params, setParams] = useState({
     confidence_level: 0.95,
-    time_horizon: 1,
-    shots: 1000
+    time_horizon_days: 10,
+    shots: 1000,
   });
 
-  const [classicalResult, setClassicalResult] = useState(null);
-  const [quantumResult, setQuantumResult] = useState(null);
+  const [selectedMetrics, setSelectedMetrics] = useState(['VaR']);
+  const [results, setResults] = useState({});
   const [loading, setLoading] = useState(false);
 
+  const toggleMetric = (key) => {
+    setSelectedMetrics(prev =>
+      prev.includes(key)
+        ? prev.filter(m => m !== key)
+        : [...prev, key]
+    );
+  };
+
   const handleRun = async () => {
+    if (selectedMetrics.length === 0) return;
+
     setLoading(true);
     try {
-      const [cRes, qRes] = await Promise.all([
-        fetchClassicalVaR(params),
-        fetchQuantumVaR(params)
-      ]);
-      setClassicalResult(cRes);
-      setQuantumResult(qRes);
+      const newResults = {};
+      for (const metric of selectedMetrics) {
+        const [classical, quantum] = await Promise.all([
+          fetchClassicalResult({ ...params, risk_metric: metric }),
+          fetchQuantumResult({ ...params, risk_metric: metric })
+        ]);
+        newResults[metric] = { classical, quantum };
+      }
+      setResults(newResults);
     } catch (error) {
       console.error("API Error", error);
     } finally {
@@ -61,9 +81,9 @@ function App() {
       <header className="header">
         <h1 className="title text-gradient">
           <Zap size={32} style={{ marginBottom: -6, marginRight: 8 }} />
-          Quantum VaR Est.
+          Quantum Risk Estimation
         </h1>
-        <p className="subtitle">Risk Analysis: Classical Monte Carlo vs. Quantum Amplitude Estimation</p>
+        <p className="subtitle">Classical Monte Carlo vs. Quantum Amplitude Estimation</p>
       </header>
 
       <div className="main-grid">
@@ -81,12 +101,13 @@ function App() {
             />
           </div>
           <div className="input-group">
-            <label>Time Horizon (Years)</label>
+            <label>Time Horizon (Days)</label>
             <input
               type="number"
+              min="1"
               className="input-field"
-              value={params.time_horizon}
-              onChange={(e) => setParams({ ...params, time_horizon: parseInt(e.target.value) })}
+              value={params.time_horizon_days}
+              onChange={(e) => setParams({ ...params, time_horizon_days: parseInt(e.target.value) })}
             />
           </div>
           <div className="input-group">
@@ -98,43 +119,81 @@ function App() {
               onChange={(e) => setParams({ ...params, shots: parseInt(e.target.value) })}
             />
           </div>
-          <button className="btn" onClick={handleRun} disabled={loading}>
-            {loading ? 'Running...' : 'Calculate VaR'}
+
+          <div className="input-group">
+            <label>Risk Metrics</label>
+            <div className="checkbox-group">
+              {RISK_METRICS.map(({ key, label, fullName }) => (
+                <label key={key} className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={selectedMetrics.includes(key)}
+                    onChange={() => toggleMetric(key)}
+                  />
+                  <span className="checkbox-text">{label}</span>
+                  <span className="checkbox-hint">{fullName}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <button
+            className="btn"
+            onClick={handleRun}
+            disabled={loading || selectedMetrics.length === 0}
+          >
+            {loading ? 'Running...' : `Calculate (${selectedMetrics.length})`}
           </button>
         </aside>
 
         <section className="results-area">
-          <div className="cards-row">
-            <div className="glass-panel result-card">
-              <div className="card-header">
-                <Activity size={20} color="var(--color-primary)" />
-                <h4>Classical Monte Carlo</h4>
-              </div>
-              <div className="metric">
-                {classicalResult ? (classicalResult.var_value * 100).toFixed(2) + '%' : '--'}
-              </div>
-              <div className="meta">
-                {classicalResult ? `${classicalResult.samples} samples` : 'Waiting for run'}
-              </div>
+          {selectedMetrics.length === 0 ? (
+            <div className="glass-panel empty-state">
+              <p>Select at least one risk metric to calculate.</p>
             </div>
+          ) : (
+            selectedMetrics.map(metric => {
+              const metricInfo = RISK_METRICS.find(m => m.key === metric);
+              const result = results[metric];
 
-            <div className="glass-panel result-card" style={{ borderColor: 'var(--color-secondary)' }}>
-              <div className="card-header">
-                <ShieldCheck size={20} color="var(--color-secondary)" />
-                <h4>Quantum AE</h4>
-              </div>
-              <div className="metric" style={{ color: 'var(--color-secondary)' }}>
-                {quantumResult ? (quantumResult.var_value * 100).toFixed(2) + '%' : '--'}
-              </div>
-              <div className="meta">
-                {quantumResult ? `Depth: ${quantumResult.depth}, Qubits: ${quantumResult.qubits}` : 'Waiting for run'}
-              </div>
-            </div>
-          </div>
+              return (
+                <div key={metric} className="metric-section">
+                  <h3 className="metric-title">{metricInfo.fullName} ({metric})</h3>
+                  <div className="cards-row">
+                    <div className="glass-panel result-card">
+                      <div className="card-header">
+                        <Activity size={18} color="var(--color-primary)" />
+                        <h4>Classical MC</h4>
+                      </div>
+                      <div className="metric">
+                        {result?.classical ? (result.classical.var_value * 100).toFixed(2) + '%' : '--'}
+                      </div>
+                      <div className="meta">
+                        {result?.classical ? `${result.classical.samples} samples` : 'Waiting'}
+                      </div>
+                    </div>
+
+                    <div className="glass-panel result-card quantum">
+                      <div className="card-header">
+                        <ShieldCheck size={18} color="var(--color-secondary)" />
+                        <h4>Quantum AE</h4>
+                      </div>
+                      <div className="metric" style={{ color: 'var(--color-secondary)' }}>
+                        {result?.quantum ? (result.quantum.var_value * 100).toFixed(2) + '%' : '--'}
+                      </div>
+                      <div className="meta">
+                        {result?.quantum ? `D:${result.quantum.depth} Q:${result.quantum.qubits}` : 'Waiting'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
 
           <div className="glass-panel chart-panel">
             <h3>Distribution Visualization</h3>
-            <div style={{ width: '100%', height: 300 }}>
+            <div style={{ width: '100%', height: 250 }}>
               <ResponsiveContainer>
                 <LineChart data={data}>
                   <XAxis dataKey="x" stroke="#888" />
