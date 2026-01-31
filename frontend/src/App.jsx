@@ -152,43 +152,49 @@ function App() {
               <p>Select at least one risk metric to calculate.</p>
             </div>
           ) : (
-            selectedMetrics.map(metric => {
-              const metricInfo = RISK_METRICS.find(m => m.key === metric);
-              const result = results[metric];
+            <>
+              {/* Column Headers */}
+              <div className="results-columns-header">
+                <div className="column-header">
+                  <Activity size={20} color="var(--color-primary)" />
+                  <h3>Classical MC</h3>
+                </div>
+                <div className="column-header quantum">
+                  <ShieldCheck size={20} color="var(--color-secondary)" />
+                  <h3>Quantum AE</h3>
+                </div>
+              </div>
 
-              return (
-                <div key={metric} className="metric-section">
-                  <h3 className="metric-title">{metricInfo.fullName} ({metric})</h3>
-                  <div className="cards-row">
-                    <div className="glass-panel result-card">
-                      <div className="card-header">
-                        <Activity size={18} color="var(--color-primary)" />
-                        <h4>Classical MC</h4>
-                      </div>
-                      <div className="metric">
-                        {result?.classical ? (result.classical.var_value * 100).toFixed(2) + '%' : '--'}
-                      </div>
-                      <div className="meta">
-                        {result?.classical ? `${result.classical.samples} samples` : 'Waiting'}
-                      </div>
-                    </div>
+              {selectedMetrics.map(metric => {
+                const metricInfo = RISK_METRICS.find(m => m.key === metric);
+                const result = results[metric];
 
-                    <div className="glass-panel result-card quantum">
-                      <div className="card-header">
-                        <ShieldCheck size={18} color="var(--color-secondary)" />
-                        <h4>Quantum AE</h4>
+                return (
+                  <div key={metric} className="metric-section">
+                    <div className="metric-label">{metricInfo.fullName} ({metric})</div>
+                    <div className="metric-row">
+                      <div className="glass-panel result-card">
+                        <div className="metric">
+                          {result?.classical ? (result.classical.var_value * 100).toFixed(2) + '%' : '--'}
+                        </div>
+                        <div className="meta">
+                          {result?.classical ? `${result.classical.samples} samples` : 'Waiting'}
+                        </div>
                       </div>
-                      <div className="metric" style={{ color: 'var(--color-secondary)' }}>
-                        {result?.quantum ? (result.quantum.var_value * 100).toFixed(2) + '%' : '--'}
-                      </div>
-                      <div className="meta">
-                        {result?.quantum ? `D:${result.quantum.depth} Q:${result.quantum.qubits}` : 'Waiting'}
+
+                      <div className="glass-panel result-card quantum">
+                        <div className="metric" style={{ color: 'var(--color-secondary)' }}>
+                          {result?.quantum ? (result.quantum.var_value * 100).toFixed(2) + '%' : '--'}
+                        </div>
+                        <div className="meta">
+                          {result?.quantum ? `D:${result.quantum.depth} Q:${result.quantum.qubits}` : 'Waiting'}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              );
-            })
+                );
+              })}
+            </>
           )}
 
           <div className="glass-panel chart-panel">

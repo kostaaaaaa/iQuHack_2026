@@ -51,11 +51,53 @@
   border-bottom: 1px dashed var(--color-border);
 }
 
-.cards-row {
+.results-columns-header {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  margin-bottom: 30px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--color-border);
+}
+
+.column-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.column-header h3 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--color-primary);
+  margin: 0;
+}
+
+.column-header.quantum h3 {
+  color: var(--color-secondary);
+}
+
+.metric-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 16px;
+}
+
+.metric-section {
+  margin-bottom: 20px;
+}
+
+.metric-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--color-text);
+  margin-bottom: 10px;
+  padding-left: 2px;
 }
 
 .result-card {
