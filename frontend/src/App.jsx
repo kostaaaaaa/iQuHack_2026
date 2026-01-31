@@ -136,19 +136,13 @@ function App() {
             <h3>Distribution Visualization</h3>
             <div style={{ width: '100%', height: 300 }}>
               <ResponsiveContainer>
-                <AreaChart data={data}>
-                  <defs>
-                    <linearGradient id="colorY" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#00f2ea" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#00f2ea" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="x" stroke="#555" />
-                  <YAxis stroke="#555" />
-                  <CartesianGrid strokeDasharray="3 3" stroke="#222" />
-                  <Tooltip contentStyle={{ backgroundColor: '#111', border: '1px solid #333' }} />
-                  <Area type="monotone" dataKey="y" stroke="#00f2ea" fillOpacity={1} fill="url(#colorY)" />
-                </AreaChart>
+                <LineChart data={data}>
+                  <XAxis dataKey="x" stroke="#888" />
+                  <YAxis stroke="#888" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ddd" />
+                  <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc' }} />
+                  <Line type="monotone" dataKey="y" stroke="#007a5e" strokeWidth={3} dot={false} />
+                </LineChart>
               </ResponsiveContainer>
             </div>
           </div>
