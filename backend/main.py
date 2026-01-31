@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .models import VaRRequest, VaRResponse, ClassicalResult, QuantumResult
+from models import VaRRequest, ClassicalResult, QuantumResult
 
 app = FastAPI(title="VaR Estimation API", description="API for Classical and Quantum VaR Estimation")
 
