@@ -1,8 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from models import VaRRequest, ClassicalResult, QuantumResult
+from analysts import get_analyst, AnalysisParams, ANALYSTS
 
-app = FastAPI(title="VaR Estimation API", description="API for Classical and Quantum VaR Estimation")
+app = FastAPI(title="VaR Estimation API", description="API for Classical and Quantum Risk Estimation")
 
 # CORS configuration to allow frontend integration
 origins = [
@@ -21,31 +22,71 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to the VaR Estimation API"}
+    return {"message": "Welcome to the Risk Estimation API"}
+
+@app.get("/api/metrics")
+async def list_metrics():
+    """List available risk metrics."""
+    return {
+        "metrics": [
+            {"key": analyst.metric_name, "name": analyst.full_name}
+            for analyst in ANALYSTS.values()
+        ]
+    }
 
 @app.post("/api/classical-var", response_model=ClassicalResult)
 async def calculate_classical_var(request: VaRRequest):
     """
-    Placeholder endpoint for Classical Monte Carlo VaR estimation.
+    Classical Monte Carlo risk estimation.
+    Supports VaR, CVaR, RVaR, and EVaR based on risk_metric parameter.
     """
-    # TODO: Implement actual logic from notebooks
-    return ClassicalResult(
-        var_value=0.15,
+    metric = getattr(request, 'risk_metric', 'VaR') or 'VaR'
+    
+    try:
+        analyst = get_analyst(metric)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
+    params = AnalysisParams(
         confidence_level=request.confidence_level,
-        samples=request.shots or 1000,
-        execution_time=0.05
+        time_horizon=request.time_horizon or 1,
+        shots=request.shots or 1000
+    )
+    
+    result = analyst.classical_analysis(params)
+    
+    return ClassicalResult(
+        var_value=result.value,
+        confidence_level=result.confidence_level,
+        samples=result.samples,
+        execution_time=result.execution_time
     )
 
 @app.post("/api/quantum-var", response_model=QuantumResult)
 async def calculate_quantum_var(request: VaRRequest):
     """
-    Placeholder endpoint for Quantum Amplitude Estimation VaR.
+    Quantum Amplitude Estimation risk estimation.
+    Supports VaR, CVaR, RVaR, and EVaR based on risk_metric parameter.
     """
-    # TODO: Implement actual Classiq SDK logic
-    return QuantumResult(
-        var_value=0.148,
+    metric = getattr(request, 'risk_metric', 'VaR') or 'VaR'
+    
+    try:
+        analyst = get_analyst(metric)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
+    params = AnalysisParams(
         confidence_level=request.confidence_level,
-        depth=50,
-        qubits=10,
-        estimated_error=0.002
+        time_horizon=request.time_horizon or 1,
+        shots=request.shots or 1000
+    )
+    
+    result = analyst.quantum_analysis(params)
+    
+    return QuantumResult(
+        var_value=result.value,
+        confidence_level=result.confidence_level,
+        depth=result.depth,
+        qubits=result.qubits,
+        estimated_error=result.estimated_error
     )

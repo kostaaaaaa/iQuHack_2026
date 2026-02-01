@@ -6,7 +6,7 @@ import './App.css';
 const RISK_METRICS = [
   { key: 'VaR', label: 'VaR', fullName: 'Value at Risk' },
   { key: 'CVaR', label: 'CVaR', fullName: 'Conditional VaR' },
-  { key: 'EVaR', label: 'EVaR', fullName: 'Entropic VaR' },
+  { key: 'EVaR', label: 'EVaR', fullName: 'Exponential VaR' },
   { key: 'RVaR', label: 'RVaR', fullName: 'Range VaR' },
 ];
 
