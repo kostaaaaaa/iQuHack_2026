@@ -8,8 +8,10 @@ app = FastAPI(title="VaR Estimation API", description="API for Classical and Qua
 # CORS configuration to allow frontend integration
 origins = [
     "http://localhost:5173",  # Vite default
+    "http://localhost:5174",  # Vite alternate port
     "http://localhost:3000",  # React default
     "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
 ]
 
 app.add_middleware(

@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Area, ComposedChart } from 'recharts';
 import { Activity, ShieldCheck, Zap } from 'lucide-react';
 import './App.css';
 
 const RISK_METRICS = [
   { key: 'VaR', label: 'VaR', fullName: 'Value at Risk' },
   { key: 'CVaR', label: 'CVaR', fullName: 'Conditional VaR' },
-  { key: 'EVaR', label: 'EVaR', fullName: 'Exponential VaR' },
   { key: 'RVaR', label: 'RVaR', fullName: 'Range VaR' },
 ];
 
@@ -32,11 +31,11 @@ const fetchQuantumResult = async (params) => {
 function App() {
   const [params, setParams] = useState({
     confidence_level: 0.95,
-    time_horizon_days: 10,
+    time_horizon: 10,
     shots: 1000,
   });
 
-  const [selectedMetrics, setSelectedMetrics] = useState(['VaR']);
+  const [selectedMetrics, setSelectedMetrics] = useState([]);
   const [results, setResults] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -71,9 +70,15 @@ function App() {
 
   // Mock data for visualization
   const data = [
-    { x: -0.2, y: 0.01 }, { x: -0.15, y: 0.05 }, { x: -0.1, y: 0.15 },
-    { x: -0.05, y: 0.35 }, { x: 0, y: 0.6 }, { x: 0.05, y: 0.35 },
-    { x: 0.1, y: 0.15 }, { x: 0.15, y: 0.05 }, { x: 0.2, y: 0.01 },
+    { x: -0.2, y: 0.01, tail: 0.01 },
+    { x: -0.15, y: 0.05, tail: 0.05 },
+    { x: -0.1, y: 0.15, tail: 0.15 },
+    { x: -0.05, y: 0.35, tail: null },
+    { x: 0, y: 0.6, tail: null },
+    { x: 0.05, y: 0.35, tail: null },
+    { x: 0.1, y: 0.15, tail: null },
+    { x: 0.15, y: 0.05, tail: null },
+    { x: 0.2, y: 0.01, tail: null },
   ];
 
   return (
@@ -106,8 +111,8 @@ function App() {
               type="number"
               min="1"
               className="input-field"
-              value={params.time_horizon_days}
-              onChange={(e) => setParams({ ...params, time_horizon_days: parseInt(e.target.value) })}
+              value={params.time_horizon}
+              onChange={(e) => setParams({ ...params, time_horizon: parseInt(e.target.value) })}
             />
           </div>
           <div className="input-group">
@@ -201,13 +206,20 @@ function App() {
             <h3>Distribution Visualization</h3>
             <div style={{ width: '100%', height: 250 }}>
               <ResponsiveContainer>
-                <LineChart data={data}>
+                <ComposedChart data={data}>
+                  <defs>
+                    <pattern id="tailPattern" patternUnits="userSpaceOnUse" width="4" height="4">
+                      <path d="M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2" stroke="#e74c3c" strokeWidth="1" />
+                    </pattern>
+                  </defs>
                   <XAxis dataKey="x" stroke="#888" />
                   <YAxis stroke="#888" />
                   <CartesianGrid strokeDasharray="3 3" stroke="#ddd" />
                   <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc' }} />
+                  <Area type="monotone" dataKey="tail" fill="url(#tailPattern)" stroke="none" />
+                  <ReferenceLine x={-0.1} stroke="#e74c3c" strokeWidth={2} strokeDasharray="5 5" label={{ value: 'α=5%', position: 'top', fill: '#e74c3c', fontSize: 12 }} />
                   <Line type="monotone" dataKey="y" stroke="#007a5e" strokeWidth={3} dot={false} />
-                </LineChart>
+                </ComposedChart>
               </ResponsiveContainer>
             </div>
           </div>

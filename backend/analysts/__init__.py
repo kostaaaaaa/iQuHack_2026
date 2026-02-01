@@ -12,7 +12,6 @@ from .base import Analyst, AnalysisParams, ClassicalResult, QuantumResult
 from .var import VaRAnalyst
 from .cvar import CVaRAnalyst
 from .rvar import RVaRAnalyst
-from .evar import EVaRAnalyst
 
 
 # Registry for easy access to analysts by metric name
@@ -20,7 +19,6 @@ ANALYSTS: Dict[str, Analyst] = {
     "VaR": VaRAnalyst(),
     "CVaR": CVaRAnalyst(),
     "RVaR": RVaRAnalyst(),
-    "EVaR": EVaRAnalyst(),
 }
 
 
@@ -39,7 +37,6 @@ __all__ = [
     "VaRAnalyst",
     "CVaRAnalyst",
     "RVaRAnalyst",
-    "EVaRAnalyst",
     "ANALYSTS",
     "get_analyst",
 ]
