@@ -1,0 +1,175 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --font-family: 'JetBrains Mono', 'Space Mono', monospace;
+
+  /* Light Scientific Palette */
+  --color-bg-deep: #f5f7fa;
+  --color-bg-card: rgba(255, 255, 255, 0.9);
+  --color-border: rgba(0, 80, 60, 0.15);
+  --color-text-main: #1a2a24;
+  --color-text-muted: #5a7068;
+
+  --color-primary: #007a5e;
+  /* Muted teal */
+  --color-secondary: #c06000;
+  /* Amber/orange */
+  --color-accent: #0066aa;
+  /* Blue */
+
+  --shadow-glow: none;
+  --glass-blur: 8px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--color-bg-deep);
+  color: var(--color-text-main);
+  background-image:
+    repeating-linear-gradient(0deg,
+      transparent,
+      transparent 50px,
+      rgba(0, 80, 60, 0.03) 50px,
+      rgba(0, 80, 60, 0.03) 51px),
+    repeating-linear-gradient(90deg,
+      transparent,
+      transparent 50px,
+      rgba(0, 80, 60, 0.03) 50px,
+      rgba(0, 80, 60, 0.03) 51px);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Utilities */
+.glass-panel {
+  background: var(--color-bg-card);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.btn {
+  background: transparent;
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
+  padding: 10px 20px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.15s ease;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: inherit;
+}
+
+.btn:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-group label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-text-muted);
+}
+
+.input-field {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-main);
+  padding: 10px 12px;
+  border-radius: 2px;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: #fff;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.text-gradient {
+  color: var(--color-primary);
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.checkbox-text {
+  font-weight: 600;
+  color: var(--color-text-main);
+}
+
+.checkbox-hint {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+
+.metric-section {
+  margin-bottom: 20px;
+}
+
+.metric-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-text-muted);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--color-border);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: var(--color-text-muted);
+}
